@@ -1,0 +1,69 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(lubridate)
+```
+
+
+preguntas propuestas
+
+1 .- 
+
+
+
+```{r}
+maximo_grado_estudios <- function(x) {
+  x %>%
+    arrange(fechaObtencion %>% desc()) %>%
+    head(1)
+}
+
+
+declaraciones_escolaridad <- declaraciones %>% 
+  # buscamos cual es su maximo nivel de estudios
+  mutate(max_educ = map(declaracion.situacionPatrimonial.datosCurricularesDeclarante.escolaridad, maximo_grado_estudios))
+```
+
+
+```{r}
+escolaridad_ingresos_cargo <-  declaraciones_escolaridad %>% 
+  select(declaracion.situacionPatrimonial.datosGenerales.rfc.rfc, #rfc
+         metadata.actualizacion, #año de declaracion
+         max_educ, # maximo grado de estudios para ese momento
+         declaracion.situacionPatrimonial.ingresos.totalIngresosAnualesNetos.valor, # ingreso anual declarado
+         declaracion.situacionPatrimonial.ingresos.totalIngresosAnualesNetos.moneda, # tipo de moneda
+         declaracion.situacionPatrimonial.datosEmpleoCargoComision.nivelOrdenGobierno, # nivel de gobierno
+         declaracion.situacionPatrimonial.datosEmpleoCargoComision.empleoCargoComision # cargo
+         ) %>% 
+  unnest(max_educ) %>% 
+  mutate(year_declaracion = metadata.actualizacion %>% lubridate::year() #año de declaracion
+         )
+
+escolaridad_ingresos_cargo
+```
+
+# cargo nivel ingreso
+
+```{r}
+escolaridad_ingresos_cargo %>% 
+  group_by(year_declaracion, 
+           declaracion.situacionPatrimonial.datosEmpleoCargoComision.nivelOrdenGobierno,
+           declaracion.situacionPatrimonial.datosEmpleoCargoComision.empleoCargoComision,
+           nivel.valor
+           ) %>% 
+  summarise(ingreso_mediana = 
+              median(declaracion.situacionPatrimonial.ingresos.totalIngresosAnualesNetos.valor, na.rm = T),
+            n = n())
+
+```
+
+
+# salarios mediana vs educacion
+
+```{r}
+declaraciones$decla
+```
+

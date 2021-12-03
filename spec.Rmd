@@ -1,0 +1,180 @@
+---
+title: "R Notebook"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+
+creative commons
+
+```{r}
+library(jsonlite)
+library(tidyverse)
+library(tidyjson)
+```
+
+
+```{r}
+#Datos de declaraciones
+declaraciones <- fromJSON("data/declaraciones.json", flatten = TRUE) 
+#Datos de personas servidoras públicas sancionadas por actos de corrupción
+servidores <- fromJSON("data/Sistema3Servidores.json",flatten = TRUE)
+#Datos de personas servidoras públicas que intervienen en contrataciones públicas
+sistemas2 <- fromJSON("data/SistemaS2.json", flatten = TRUE )
+```
+
+```{r}
+declaraciones
+```
+
+
+
+# tenemos codigo postal
+
+```{r}
+declaraciones_muestra <- declaraciones %>% 
+  head() %>% 
+  as_tibble()
+
+declaraciones_muestra %>% 
+  unnest(declaracion.situacionPatrimonial.datosCurricularesDeclarante.escolaridad)
+```
+
+# guardamos la muestra
+
+```{r}
+save(declaraciones_muestra, file="declaraciones_muestra.Rda")
+```
+
+```{r}
+load("declaraciones_muestra.RData")
+
+```
+
+
+```{r}
+declaraciones_muestra$metadata
+```
+
+```{r}
+#Educacion
+#años de haber finalizado sus estudios
+declaraciones_muestra$declaracion$situacionPatrimonial$datosCurricularesDeclarante$escolaridad[[1]]$fechaObtencion
+```
+
+```{r}
+declaraciones_muestra$declaracion$situacionPatrimonial$datosGenerales$situacionPersonalEstadoCivil
+```
+
+
+```{r}
+#Ubicacion
+declaraciones_muestra$declaracion$situacionPatrimonial$domicilioDeclarante$domicilioMexico
+
+```
+
+
+```{r}
+#cargo y contrato, fechaTomaPosesion, ubicacion trabajo
+declaraciones_muestra$declaracion$situacionPatrimonial$datosEmpleoCargoComision
+```
+```{r}
+# podemos saber si tiene experiencia laboral, y tiempo de trabajar,
+# tiempo en el sector publico
+declaraciones_muestra$declaracion$situacionPatrimonial$experienciaLaboral$experiencia[[2]]
+```
+
+
+```{r}
+# informacion de la pareja, y dependientes economicos
+declaraciones_muestra$declaracion$situacionPatrimonial$datosPareja
+declaraciones_muestra$declaracion$situacionPatrimonial$datosDependienteEconomico
+```
+
+
+```{r}
+#ingresos
+declaraciones_muestra$declaracion$situacionPatrimonial$ingresos
+```
+
+```{r}
+#inmuebles precio y contrastar si vale lo declarado 
+declaraciones_muestra$declaracion$situacionPatrimonial$bienesInmuebles$
+```
+
+# numero de declaraciones por rfc
+
+```{r}
+declaraciones$declaracion$situacionPatrimonial$datosGenerales$rfc %>% 
+  count(rfc, sort = T)
+```
+
+```{r}
+declaraciones_muestra
+```
+
+
+```{r}
+declaraciones_muestra %>% unnest() %>% unnest()%>% unnest()
+```
+
+# servidores sancionados
+
+```{r}
+# lugar donde laborab
+servidores$servidorPublicoSancionado.rfc = do.call(rbind.data.frame, servidores$servidorPublicoSancionado.rfc)
+servidores <- servidores %>% 
+  unnest(servidorPublicoSancionado.rfc)
+servidores
+```
+
+```{r}
+# lugar donde laborab
+servidores[1,] %>% 
+  str()
+```
+
+```{r}
+
+servidores_sanciones <- servidores %>% 
+  mutate(tipoSancion = map_chr(tipoSancion, ~ .[['valor']]) )
+
+```
+
+# Caso especial
+```{r}
+servidores_sanciones
+
+```
+
+
+```{r}
+sistemas2[1,] %>% 
+  str()
+```
+
+
+
+
+
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
