@@ -1,0 +1,20 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+
+# servidores sancionadas con declaracion
+
+servidores %>% 
+  inner_join(declaraciones, by = c("rfc" = "declaracion.situacionPatrimonial.datosGenerales.rfc.rfc"))
+  
+```
+
+```{r}
+x <- declaraciones %>% filter(declaracion.situacionPatrimonial.datosGenerales.rfc.rfc == "TAKV710225") 
+
+x
+```
+
